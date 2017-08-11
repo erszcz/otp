@@ -112,9 +112,13 @@ send_handshake_flight(#state{socket = Socket,
 			     negotiated_version = Version,
 			     connection_states = ConnectionStates0} = State0, Epoch) ->
     %% TODO remove hardcoded Max size
-    {Encoded, ConnectionStates} =
-	encode_handshake_flight(lists:reverse(Flight), Version, 1400, Epoch, ConnectionStates0),
-    send(Transport, Socket, Encoded),
+    ConnectionStates =
+	lists:foldr(fun (Handshake, ConnectionStatesAcc0) ->
+			    {Encoded, ConnectionStatesAcc} =
+				encode_handshake_flight([Handshake], Version, 1400, Epoch, ConnectionStatesAcc0),
+			    send(Transport, Socket, Encoded),
+			    ConnectionStatesAcc
+		    end, ConnectionStates0, Flight),
     {State0#state{connection_states = ConnectionStates}, []};
 
 send_handshake_flight(#state{socket = Socket,
