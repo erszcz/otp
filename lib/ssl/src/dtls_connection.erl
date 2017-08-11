@@ -127,12 +127,16 @@ send_handshake_flight(#state{socket = Socket,
 					       change_cipher_spec := ChangeCipher,
 					       handshakes_after_change_cipher_spec := []},
 			     negotiated_version = Version,
-			     connection_states = ConnectionStates0} = State0, Epoch) ->      
-    {HsBefore, ConnectionStates1} =
-	encode_handshake_flight(lists:reverse(Flight0), Version, 1400, Epoch, ConnectionStates0),
+			     connection_states = ConnectionStates0} = State0, Epoch) ->
+    ConnectionStates1 =
+	lists:foldr(fun (Handshake, ConnectionStatesAcc0) ->
+			    {Encoded, ConnectionStatesAcc} =
+				encode_handshake_flight([Handshake], Version, 1400, Epoch, ConnectionStatesAcc0),
+			    send(Transport, Socket, Encoded),
+			    ConnectionStatesAcc
+		    end, ConnectionStates0, Flight0),
     {EncChangeCipher, ConnectionStates} = encode_change_cipher(ChangeCipher, Version, Epoch, ConnectionStates1),
-
-    send(Transport, Socket, [HsBefore, EncChangeCipher]),
+    send(Transport, Socket, [EncChangeCipher]),
     {State0#state{connection_states = ConnectionStates}, []};
 
 send_handshake_flight(#state{socket = Socket,
@@ -141,14 +145,24 @@ send_handshake_flight(#state{socket = Socket,
 					       change_cipher_spec := ChangeCipher,
 					       handshakes_after_change_cipher_spec := Flight1},
 			     negotiated_version = Version,
-			     connection_states = ConnectionStates0} = State0, Epoch) ->      
-    {HsBefore, ConnectionStates1} =
-	encode_handshake_flight(lists:reverse(Flight0), Version, 1400, Epoch-1, ConnectionStates0),
+			     connection_states = ConnectionStates0} = State0, Epoch) ->
+    ConnectionStates1 =
+	lists:foldr(fun (Handshake, ConnectionStatesAcc0) ->
+			    {Encoded, ConnectionStatesAcc} =
+				encode_handshake_flight([Handshake], Version, 1400, Epoch-1, ConnectionStatesAcc0),
+			    send(Transport, Socket, Encoded),
+			    ConnectionStatesAcc
+		    end, ConnectionStates0, Flight0),
     {EncChangeCipher, ConnectionStates2} = 
 	encode_change_cipher(ChangeCipher, Version, Epoch-1, ConnectionStates1),
-    {HsAfter, ConnectionStates} =
-	encode_handshake_flight(lists:reverse(Flight1), Version, 1400, Epoch, ConnectionStates2),
-    send(Transport, Socket, [HsBefore, EncChangeCipher, HsAfter]),
+    send(Transport, Socket, [EncChangeCipher]),
+    ConnectionStates =
+	lists:foldr(fun (Handshake, ConnectionStatesAcc0) ->
+			    {Encoded, ConnectionStatesAcc} =
+				encode_handshake_flight([Handshake], Version, 1400, Epoch, ConnectionStatesAcc0),
+			    send(Transport, Socket, Encoded),
+			    ConnectionStatesAcc
+		    end, ConnectionStates2, Flight1),
     {State0#state{connection_states = ConnectionStates}, []};
 
 send_handshake_flight(#state{socket = Socket,
@@ -160,9 +174,14 @@ send_handshake_flight(#state{socket = Socket,
 			     connection_states = ConnectionStates0} = State0, Epoch) ->
     {EncChangeCipher, ConnectionStates1} = 
 	encode_change_cipher(ChangeCipher, Version, Epoch-1, ConnectionStates0),
-    {HsAfter, ConnectionStates} =
-	encode_handshake_flight(lists:reverse(Flight1), Version, 1400, Epoch, ConnectionStates1),
-    send(Transport, Socket, [EncChangeCipher, HsAfter]),
+    send(Transport, Socket, [EncChangeCipher]),
+    ConnectionStates =
+	lists:foldr(fun (Handshake, ConnectionStatesAcc0) ->
+			    {Encoded, ConnectionStatesAcc} =
+				encode_handshake_flight([Handshake], Version, 1400, Epoch, ConnectionStatesAcc0),
+			    send(Transport, Socket, Encoded),
+			    ConnectionStatesAcc
+		    end, ConnectionStates1, Flight1),
     {State0#state{connection_states = ConnectionStates}, []}.
 
 queue_change_cipher(ChangeCipher, #state{flight_buffer = Flight,
