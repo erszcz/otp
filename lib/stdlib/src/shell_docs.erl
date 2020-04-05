@@ -71,13 +71,23 @@ validate(#docs_v1{ module_doc = MDocs, docs = AllDocs }) ->
     true = lists:all(fun(Elem) -> ?IS_INLINE(Elem) end, ?INLINE),
     true = lists:all(fun(Elem) -> ?IS_BLOCK(Elem) end, ?BLOCK),
 
-    _ = maps:map(fun(_Key,MDoc) -> validate(MDoc,[]) end, MDocs),
+    _ = case MDocs of
+            _ when MDocs =:= none;
+                   MDocs =:= hidden -> ok;
+            _ when is_map(MDocs) ->
+                maps:map(fun(_Key,MDoc) -> validate(MDoc,[]) end, MDocs)
+        end,
     lists:foreach(fun({_,_Anno, Sig, Docs, _Meta}) ->
                       case lists:all(fun erlang:is_binary/1, Sig) of
                           false -> throw({invalid_signature,Sig});
                           true -> ok
                       end,
-                      maps:map(fun(_Key,Doc) -> validate(Doc,[]) end, Docs)
+                      _ = case Docs of
+                              _ when Docs =:= none;
+                                     Docs =:= hidden -> ok;
+                              _ when is_map(Docs) ->
+                                  maps:map(fun(_Key,Doc) -> validate(Doc,[]) end, Docs)
+                          end
               end, AllDocs),
     ok.
 validate([H|T],Path) when is_tuple(H) ->
