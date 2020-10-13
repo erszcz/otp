@@ -2,7 +2,7 @@
 %% @since 0.12
 -module(edoc_layout_chunks).
 
--behaviour(edoc_layout).
+%-behaviour(edoc_layout).
 -export([module/2]).
 
 %% This breaks the convention stated in `edoc_doclet' to not rely on `edoc.hrl'
@@ -101,7 +101,7 @@ doc_contents(XPath, Doc, Opts) ->
 	regular -> doc_contents_(XPath, Doc, Opts)
     end.
 
-doc_visibility(XPath, Doc, Opts) ->
+doc_visibility(_XPath, Doc, Opts) ->
     case {xpath_to_text("./@private", Doc, Opts),
 	  xpath_to_text("./@hidden", Doc, Opts)}
     of
@@ -115,7 +115,7 @@ doc_visibility(XPath, Doc, Opts) ->
 	    regular
     end.
 
-doc_contents_(XPath, Doc, Opts) ->
+doc_contents_(_XPath, Doc, Opts) ->
     Equiv = xpath_to_chunk("./equiv", Doc),
     Desc = xpath_to_chunk("./description/fullDescription", Doc),
     See = xpath_to_chunk("./see", Doc),

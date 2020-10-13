@@ -34,7 +34,7 @@
 
 -export([run/2]).
 
--import(edoc_report, [report/2, warning/2]).
+-import(edoc_report, [report/2]).
 
 %% @headerfile "../include/edoc_doclet.hrl"
 -include("../include/edoc_doclet.hrl").
