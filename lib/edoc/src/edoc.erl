@@ -98,9 +98,12 @@
 
 -type tag() :: #tag{name :: atom(),
 		    line :: integer(),
-		    origin :: comment,
-		    data :: term()}.
+		    origin :: comment | code,
+		    data :: term(),
+		    form :: undefined | erl_syntax:tree()}.
 %% Generic tag information.
+%% `#tag.form' is only defined if `#tag.origin' is `code',
+%% that is the `#tag{}' represents a code fragment, not a doc comment tag.
 
 -type edoc_module() :: xmerl_scan:xmlElement().
 %% The EDoc documentation data for a module,
