@@ -43,7 +43,8 @@ main([Application, FromXML, FromBeam, _Escript, ToChunk]) ->
             io:format("Failed to create chunks: ~p~n",[Reason]),
             erlang:halt(1);
         {docs_v1,_,_,_,_,#{ source := S },[]} when
-              %% This is a list of all modules that do are known not have any functions
+              %% This is a list of all modules that are known not to have any functions
+              S =/= "../xml/edoc_doclet.xml",
               S =/= "../xml/gen_fsm.xml",
               S =/= "../xml/shell_default.xml",
               S =/= "../xml/user.xml",
