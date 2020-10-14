@@ -1,5 +1,4 @@
 %% @doc Convert EDoc module documentation to an EEP-48 `docs_v1' chunk.
-%% @since 0.12
 -module(edoc_layout_chunks).
 
 %-behaviour(edoc_layout).
@@ -32,11 +31,12 @@
                             docs :: [docs_v1_entry()]}.
 %% The Docs v1 chunk according to EEP 48.
 
--type docs_v1_entry() :: #docs_v1_entry{kind_name_arity :: {atom(), atom(), arity()},
-                                        anno :: erl_anno:anno(),
-                                        signature :: signature(),
-                                        doc :: doc(),
-                                        metadata :: metadata()}.
+-type docs_v1_entry() :: {_KindNameArity :: {atom(), atom(), arity()},
+                          _Anno :: erl_anno:anno(),
+                          _Signature :: signature(),
+                          _Doc :: doc(),
+                          _Metadata :: metadata()}.
+%% This type is equivalent to the #docs_v1_entry{} record, but with the record name field skipped.
 
 -type beam_language() :: atom().
 -type mime_type() :: binary().
