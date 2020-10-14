@@ -149,7 +149,7 @@ gen(Sources, App, Modules, Ctxt) ->
 
 title(App, Options) ->
     proplists:get_value(title, Options,
-			if App == ?NO_APP ->
+			if App == no_app ->
 				"Overview";
 			   true ->
 				io_lib:fwrite("Application: ~ts", [App])

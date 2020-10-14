@@ -150,7 +150,7 @@ type(Doc, Opts) ->
     docs_v1_entry(type, Name, Arity, Anno, EntryDoc, Metadata).
 
 -spec meta_type_sig(atom(), arity(), erl_anno:anno(), [edoc:entry()]) -> Metadata when
-      Metadata :: #{signature => erl_parse:abstract_form()}.
+      Metadata :: [{signature, [erl_parse:abstract_form()]}].
 meta_type_sig(Name, Arity, Anno, Entries) ->
     Line = erl_anno:line(Anno),
     Tags = edoc_data:get_all_tags(Entries),
@@ -372,7 +372,9 @@ inconsistent_docgen_attrs(Attrs) ->
     %% Only one of `docgen-rel` and `docgen-href` is found - should not happen!
     erlang:error({inconsistent_docgen_attrs, Attrs}).
 
--spec expand_docgen_rel(edoc_refs:docgen_rel()) -> string().
+%% @doc `Rel' is actually a stringified {@link edoc_refs:docgen_rel()}.
+-spec expand_docgen_rel(Rel) -> string() when
+      Rel :: string().
 expand_docgen_rel(Rel)
   when Rel =:= "seemfa"; Rel =:= "seeerl"; Rel =:= "seetype"; Rel =:= "seeapp";
        Rel =:= "seecom"; Rel =:= "seecref"; Rel =:= "seefile" ; Rel =:= "seeguide" ->
