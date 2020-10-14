@@ -276,7 +276,6 @@ xpath_to_chunk(XPath, Doc) ->
 %%' Xmerl to chunk format
 %%
 
-%% TODO: shell_docs:chunk_elements() is not exported yet.
 -spec xmerl_to_chunk(edoc:xmerl_module()) -> shell_docs:chunk_elements().
 xmerl_to_chunk(Contents) ->
     shell_docs:normalize(format_content(Contents)).
