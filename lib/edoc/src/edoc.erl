@@ -66,7 +66,7 @@
 	      entry/0,
 	      entry_data/0,
 	      tag/0,
-	      xmerl_module/0]).
+	      edoc_module/0]).
 
 -include("edoc.hrl").
 
@@ -102,7 +102,7 @@
 		    data :: term()}.
 %% Generic tag information.
 
--type xmerl_module() :: any().
+-type edoc_module() :: xmerl_scan:xmlElement().
 %% The EDoc documentation data for a module,
 %% expressed as an XML document in {@link //xmerl. XMerL} format. See
 %% the file <a href="edoc.dtd">`edoc.dtd'</a> for details.
@@ -517,7 +517,7 @@ read(File, Opts) ->
 
 %% @equiv layout(Doc, [])
 
--spec layout(xmerl_module()) -> string().
+-spec layout(edoc_module()) -> string().
 layout(Doc) ->
     layout(Doc, []).
 
@@ -543,7 +543,7 @@ layout(Doc) ->
 %% INHERIT-OPTIONS: edoc_lib:run_layout/2
 
 -spec layout(Doc, Opts) -> string() when
-      Doc :: xmerl_module(),
+      Doc :: edoc_module(),
       Opts :: proplist().
 layout(Doc, Opts) ->
     F = fun (M) ->
@@ -771,7 +771,7 @@ helpful_message(Name) ->
 
 %% @equiv get_doc(File, [])
 
--spec get_doc(filename()) -> {module(), xmerl_module()}.
+-spec get_doc(filename()) -> {module(), edoc_module()}.
 get_doc(File) ->
     get_doc(File, []).
 
@@ -821,7 +821,7 @@ get_doc(File) ->
 %% INHERIT-OPTIONS: get_doc/3
 %% INHERIT-OPTIONS: edoc_lib:get_doc_env/3
 
--spec get_doc(File, Options) -> {module(), xmerl_module()} when
+-spec get_doc(File, Options) -> {module(), edoc_module()} when
       File :: filename(),
       Options :: proplist().
 get_doc(File, Opts) ->
@@ -839,7 +839,7 @@ get_doc(File, Opts) ->
       File :: filename(),
       Env :: env(),
       Options :: proplist(),
-      R :: {module(), xmerl_module()}
-         | {module(), xmerl_module(), [entry()]}.
+      R :: {module(), edoc_module()}
+         | {module(), edoc_module(), [entry()]}.
 get_doc(File, Env, Opts) ->
     edoc_extract:source(File, Env, Opts).
