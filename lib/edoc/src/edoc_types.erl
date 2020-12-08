@@ -157,7 +157,43 @@ to_label(N) ->
     edoc_refs:to_label(to_ref(N)).
 
 get_uri(Name, Env) ->
-    edoc_refs:get_uri(to_ref(Name), Env).
+    NewName = infer_module_app(Name),
+    edoc_refs:get_uri(to_ref(NewName), Env).
+
+%% @doc Infer application containing the given module.
+%%
+%% This could be based on `#env.apps', which in turn are based on $APP/doc/edoc-info files
+%% (see `edoc_lib:get_doc_links').
+%%
+%% The current approach will only work for OTP apps.
+infer_module_app(#t_name{app = [], module = M} = TName) when is_atom(M) ->
+    case infer_module_app_(M) of
+	no_app ->
+	    TName;
+	App when is_atom(App) ->
+	    TName#t_name{app = App}
+    end;
+infer_module_app(Other) ->
+    Other.
+
+infer_module_app_(Mod) ->
+    LibDir = code:lib_dir(),
+    case code:which(Mod) of
+	ModPath when is_list(ModPath) ->
+	    case starts_with(ModPath, LibDir) of
+		false ->
+		    no_app;
+		true ->
+		    [AppVer | _] = string:tokens(ModPath -- LibDir, "/"),
+		    [App | _] = string:tokens(AppVer, "-"),
+		    list_to_atom(App)
+	    end;
+	_ ->
+	    no_app
+    end.
+
+starts_with(String, Prefix) ->
+    string:find(String, Prefix) =:= String.
 
 to_xml(#t_var{name = N}, _Env) ->
     {typevar, [{name, atom_to_list(N)}], []};
