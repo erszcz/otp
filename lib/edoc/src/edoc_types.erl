@@ -157,7 +157,8 @@ to_label(N) ->
     edoc_refs:to_label(to_ref(N)).
 
 get_uri(Name, Env) ->
-    edoc_refs:get_uri(to_ref(Name), Env).
+    "zzz".
+    %edoc_refs:get_uri(to_ref(Name), Env).
 
 to_xml(#t_var{name = N}, _Env) ->
     {typevar, [{name, atom_to_list(N)}], []};
