@@ -115,7 +115,6 @@
 		      Column :: integer(),
 		      Indentation :: integer(),
 		      Text :: [string()] }.
--type syntaxTree() :: erl_syntax:syntaxTree().
 
 -compile({no_auto_import, [error/1]}).
 
@@ -570,7 +569,7 @@ read_comments(File, _Opts) ->
 
 %% @equiv read_source(File, [])
 
--spec read_source(filename()) -> [syntaxTree()].
+-spec read_source(filename()) -> [erl_syntax:syntaxTree()].
 read_source(Name) ->
     read_source(Name, []).
 
@@ -618,7 +617,7 @@ read_source(Name) ->
 
 %% NEW-OPTIONS: [no_]preprocess (preprocess -> includes, macros)
 
--spec read_source(File, Opts) -> [syntaxTree()] when
+-spec read_source(File, Opts) -> [erl_syntax:syntaxTree()] when
       File :: filename(),
       Opts :: proplist().
 read_source(Name, Opts0) ->
