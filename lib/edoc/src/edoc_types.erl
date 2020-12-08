@@ -157,8 +157,17 @@ to_label(N) ->
     edoc_refs:to_label(to_ref(N)).
 
 get_uri(Name, Env) ->
-    "zzz".
-    %edoc_refs:get_uri(to_ref(Name), Env).
+    NewName = infer_app(Name),
+    edoc_refs:get_uri(to_ref(NewName), Env).
+
+infer_app(#t_name{app = [], module = M, name = N} = TName) ->
+    A = infer_app(M, N),
+    TName#t_name{app = A};
+infer_app(Other) ->
+    Other.
+
+infer_app(Mod, Name) ->
+    hardcoded_app_name.
 
 to_xml(#t_var{name = N}, _Env) ->
     {typevar, [{name, atom_to_list(N)}], []};

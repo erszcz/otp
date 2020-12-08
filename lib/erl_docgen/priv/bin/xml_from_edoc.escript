@@ -44,6 +44,7 @@
 %% Description:
 %%----------------------------------------------------------------------
 main(RawOpts) ->
+    io:format("-------------------> IT'S ME <-------------------\n", []),
     case catch parse(RawOpts, erlref, #args{}) of
 	{ok, File, Type, Args} ->
 	    case Type of

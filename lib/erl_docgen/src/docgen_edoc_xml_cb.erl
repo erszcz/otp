@@ -989,6 +989,8 @@ makesee(Ref) ->
         ["chapter",Anchor] ->
             {seeguide,"chapter#" ++ Anchor};
         [Mod,"type-"++Anchor] ->
+	    io:format("-------------------> IT'S ME AGAIN <-------------------\n", []),
+	    io:format("ref: ~p\n", [Ref]),
             {seeerl,Mod ++ "#type-" ++ Anchor};
         ["",_Anchor] ->
             case get(type) of
