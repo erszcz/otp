@@ -36,7 +36,8 @@
                           _Signature :: signature(),
                           _Doc :: doc(),
                           _Metadata :: metadata()}.
-%% This type is equivalent to the #docs_v1_entry{} record, but with the record name field skipped.
+%% A tuple equivalent to the `#docs_v1_entry{}' record,
+%% but with the record name field skipped.
 
 -type beam_language() :: atom().
 -type mime_type() :: binary().
@@ -46,12 +47,12 @@
 -type metadata() :: map().
 -type signature() :: [binary()].
 
--type xmerl_document_node() :: #xmlElement{}
-                             | #xmlText{}
-                             | #xmlPI{}
-                             | #xmlComment{}
-                             | #xmlDecl{}.
-%% `#xmlElement.content' as defined by `xmerl.hrl'.
+-type xmerl_doc_node() :: #xmlComment{}
+                        | #xmlElement{}
+                        | #xmlPI{}
+                        | #xmlText{}.
+%% Subtype of {@link xmerl_xpath:docNodes()}.
+%% It corresponds to `#xmlElement.content' as defined by `xmerl.hrl', sans the `#xmlDecl{}'.
 
 -type xmerl_attribute() :: #xmlAttribute{}.
 
@@ -62,7 +63,7 @@
 %%
 
 %% @doc Convert EDoc module documentation to an EEP-48 style doc chunk.
--spec module(edoc:xmerl_module(), proplists:proplist()) -> binary().
+-spec module(edoc:edoc_module(), proplists:proplist()) -> binary().
 module(Doc, Options) ->
     %% Require `entries' or fail.
     case lists:keyfind(entries, 1, Options) of
@@ -76,7 +77,7 @@ module(Doc, Options) ->
 %%' Chunk construction
 %%
 
--spec edoc_to_chunk(edoc:xmerl_module(), proplists:proplist()) -> docs_v1().
+-spec edoc_to_chunk(edoc:edoc_module(), proplists:proplist()) -> docs_v1().
 edoc_to_chunk(Doc, Opts) ->
     [Doc] = xmerl_xpath:string("//module", Doc),
     {source, File} = lists:keyfind(source, 1, Opts),
@@ -92,7 +93,7 @@ edoc_to_chunk(Doc, Opts) ->
 
 -spec doc_contents(XPath, Doc, Opts) -> doc() when
       XPath :: xpath(),
-      Doc :: edoc:xmerl_module(),
+      Doc :: edoc:edoc_module(),
       Opts :: proplists:proplist().
 doc_contents(XPath, Doc, Opts) ->
     case doc_visibility(XPath, Doc, Opts) of
@@ -276,18 +277,17 @@ xpath_to_chunk(XPath, Doc) ->
 %%' Xmerl to chunk format
 %%
 
--spec xmerl_to_chunk(edoc:xmerl_module()) -> shell_docs:chunk_elements().
+-spec xmerl_to_chunk([xmerl_doc_node()]) -> shell_docs:chunk_elements().
 xmerl_to_chunk(Contents) ->
     shell_docs:normalize(format_content(Contents)).
 
--spec format_content(edoc:xmerl_module()) -> shell_docs:chunk_elements().
+-spec format_content([xmerl_doc_node()]) -> shell_docs:chunk_elements().
 format_content(Contents) ->
     lists:flatten([ format_content_(C) || C <- Contents ]).
 
--spec format_content_(xmerl_document_node()) -> shell_docs:chunk_elements().
+-spec format_content_(xmerl_doc_node()) -> shell_docs:chunk_elements().
 format_content_(#xmlPI{})      -> [];
 format_content_(#xmlComment{}) -> [];
-format_content_(#xmlDecl{})    -> [];
 
 format_content_(#xmlText{} = T) ->
     Text = T#xmlText.value,
