@@ -1132,7 +1132,8 @@ recon_alloc.chunk  recon_map.chunk    recon_trace.chunk
 '''
 
 The project does not have to be built with Rebar3 - the above is just an example.
-From now on the chunks will be available as the source of documentation for the Erlang shell:
+From now on the chunks will be available as the source
+of {@link //stdlib/shell_docs. documentation for the Erlang shell}:
 
 ```
 $ erl -pa _build/default/lib/recon/ebin
