@@ -27,9 +27,11 @@
 	 f_sig_single_simple_clause/1,
 	 f_sig_single_simple_clause_with_spec/1,
 	 f_sig_multiple_simple_clauses/1,
+	 f_sig_multiple_simple_clauses_with_spec/1,
 	 f_sig_single_record_clause/1,
 	 f_sig_single_record_clause_with_spec/1,
-	 f_sig_multiple_record_clauses/1]).
+	 f_sig_multiple_record_clauses/1,
+	 f_sig_multiple_record_clauses_with_spec/1]).
 
 %%
 %% CT preamble
@@ -53,9 +55,11 @@ all() -> [edoc_app_should_pass_shell_docs_validation,
 	  f_sig_single_simple_clause,
 	  f_sig_single_simple_clause_with_spec,
 	  f_sig_multiple_simple_clauses,
+	  f_sig_multiple_simple_clauses_with_spec,
 	  f_sig_single_record_clause,
 	  f_sig_single_record_clause_with_spec,
-	  f_sig_multiple_record_clauses].
+	  f_sig_multiple_record_clauses,
+	  f_sig_multiple_record_clauses_with_spec].
 
 %% TODO: remove these cases once EDoc supports extracting the relevant tags
 not_supported() -> [type_since_tag,
@@ -201,8 +205,13 @@ f_sig_single_simple_clause_with_spec(Config) ->
     ?assertEqual([?a2b(?FUNCTION_NAME),<<"(">>,<<"Arg">>,<<")">>,<<"\n">>],
 		 get_sig({function, ?FUNCTION_NAME, 1}, Docs)).
 
-
 f_sig_multiple_simple_clauses(Config) ->
+    Docs = get_docs(Config, eep48_sigs),
+    %?debugVal(Docs, 1000),
+    ?assertEqual([?a2b(?FUNCTION_NAME),<<"(">>,<<"C1A1, ">>,<<"C1A2">>,<<")">>,<<"\n">>],
+		 get_sig({function, ?FUNCTION_NAME, 2}, Docs)).
+
+f_sig_multiple_simple_clauses_with_spec(Config) ->
     Docs = get_docs(Config, eep48_sigs),
     %?debugVal(Docs, 1000),
     ?assertEqual([?a2b(?FUNCTION_NAME),<<"(">>,<<"C1A1, ">>,<<"C1A2">>,<<")">>,<<"\n">>],
@@ -221,6 +230,12 @@ f_sig_single_record_clause_with_spec(Config) ->
 		 get_sig({function, ?FUNCTION_NAME, 1}, Docs)).
 
 f_sig_multiple_record_clauses(Config) ->
+    Docs = get_docs(Config, eep48_sigs),
+    %?debugVal(Docs, 1000),
+    ?assertEqual([?a2b(?FUNCTION_NAME),<<"(">>,<<"R">>,<<")">>,<<"\n">>],
+		 get_sig({function, ?FUNCTION_NAME, 1}, Docs)).
+
+f_sig_multiple_record_clauses_with_spec(Config) ->
     Docs = get_docs(Config, eep48_sigs),
     %?debugVal(Docs, 1000),
     ?assertEqual([?a2b(?FUNCTION_NAME),<<"(">>,<<"R">>,<<")">>,<<"\n">>],
