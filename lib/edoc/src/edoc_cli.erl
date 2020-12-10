@@ -86,10 +86,11 @@ print(Fmt, Args) ->
     io:format(Fmt, Args).
 
 usage() ->
-    "Usage: edoc.escript -app App [-chunks]\n"
-    "       edoc.escript -files File1 ... FileN [-chunks]\n"
+    "Usage: edoc.escript -app App [-pa Path] [-chunks]\n"
+    "       edoc.escript -files File1 ... FileN [-pa Path] [-chunks]\n"
     "\n"
     "Run EDoc from the command line.\n"
     "  -app   \truns edoc:application/2\n"
     "  -files \truns edoc:files/2\n"
+    "  -pa    \tadd Path to Erlang code path; can be used multiple times\n"
     "  -chunks\twhen present, only doc chunks are generated\n".
