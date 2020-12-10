@@ -144,11 +144,12 @@ type(Doc, Opts) ->
     [#xmlElement{content=Content}] = xmerl_xpath:string("./typedef/argtypes", Doc),
     Arity = length(Content),
     Anno = anno(Doc, Opts),
+    Signature = [list_to_binary(atom_to_list(Name) ++ "/" ++ integer_to_list(Arity))],
     EntryDoc = doc_contents("./description/fullDescription", Doc, Opts),
     Metadata = maps:from_list(meta_deprecated(Doc, Opts) ++
 			      meta_since(Doc, Opts) ++
 			      meta_type_sig(Name, Arity, Anno, entries(Opts))),
-    docs_v1_entry(type, Name, Arity, Anno, EntryDoc, Metadata).
+    docs_v1_entry(type, Name, Arity, Anno, Signature, EntryDoc, Metadata).
 
 -spec meta_type_sig(atom(), arity(), erl_anno:anno(), [edoc:entry()]) -> Metadata when
       Metadata :: [{signature, [erl_parse:abstract_form()]}].
@@ -183,8 +184,9 @@ callback(Cb = #tag{name = callback, origin = code}, Opts) ->
 	       end,
     {source, File} = lists:keyfind(source, 1, Opts),
     Anno = erl_anno:set_file(File, erl_anno:new(Line)),
+    Signature = [list_to_binary(atom_to_list(Name) ++ "/" ++ integer_to_list(Arity))],
     Metadata = maps:from_list([{signature, [Form]}]),
-    docs_v1_entry(callback, Name, Arity, Anno, EntryDoc, Metadata).
+    docs_v1_entry(callback, Name, Arity, Anno, Signature, EntryDoc, Metadata).
 
 functions(Doc, Opts) ->
     [function(F, Opts) || F <- xmerl_xpath:string("//module/functions/function", Doc)].
@@ -192,25 +194,51 @@ functions(Doc, Opts) ->
 function(Doc, Opts) ->
     Name = xpath_to_atom("./@name", Doc, Opts),
     Arity = xpath_to_integer("./@arity", Doc, Opts),
-    {Line, MetaSig} = function_line_and_signature({Name, Arity}, entries(Opts)),
+    {Line, Signature, Spec} = function_line_sig_spec({Name, Arity}, entries(Opts)),
     {source, File} = lists:keyfind(source, 1, Opts),
     Anno = erl_anno:set_file(File, erl_anno:new(Line)),
     EntryDoc = doc_contents("./", Doc, Opts),
     Metadata = maps:from_list(meta_deprecated(Doc, Opts) ++
 			      meta_since(Doc, Opts) ++
-			      MetaSig),
-    docs_v1_entry(function, Name, Arity, Anno, EntryDoc, Metadata).
+			      Spec),
+    docs_v1_entry(function, Name, Arity, Anno, Signature, EntryDoc, Metadata).
 
--spec function_line_and_signature(edoc:function_name(), [edoc:entry()]) -> R when
-      R :: {non_neg_integer(), [{signature, erl_parse:abstract_form()}]}.
-function_line_and_signature(NA, Entries) ->
+-spec function_line_sig_spec(edoc:function_name(), [edoc:entry()]) -> R when
+      R :: {non_neg_integer(), signature(), [{signature, erl_parse:abstract_form()}]}.
+function_line_sig_spec(NA, Entries) ->
     #entry{name = NA, line = Line} = E = lists:keyfind(NA, #entry.name, Entries),
+    Sig = format_signature(E),
     case lists:keyfind(spec, #tag.name, E#entry.data) of
 	false ->
-	    {Line, []};
+	    {Line, Sig, []};
 	#tag{name = spec} = T ->
-	    {Line, [{signature, [erl_syntax:revert(T#tag.form)]}]}
+	    {Line, Sig, [{signature, [erl_syntax:revert(T#tag.form)]}]}
     end.
+
+format_signature(E = #entry{}) ->
+    %% Apparently, `#entry.args' is sometimes a list of args,
+    %% but sometimes a list of function clauses, each containing args.
+    %%
+    %% It seems that multiple clauses accepting a record, but matching on different fields,
+    %% are flattened to a single clause.
+    %% In such a case, the arg name is the uppercased record name.
+    {Name, _} = E#entry.name,
+    case E#entry.args of
+	[Clause | _] = Clauses when is_list(Clause) ->
+	    lists:flatmap(fun (Clause) -> format_sig_clause(Name, Clause) end, Clauses);
+	Args when is_list(Args) ->
+	    format_sig_clause(Name, Args)
+    end.
+
+format_sig_clause(Name, Args) ->
+    [list_to_binary(atom_to_list(Name)),  <<"(">> | format_sig_clause(Args)] ++ [<<"\n">>].
+
+format_sig_clause([]) ->
+    [<<")">>];
+format_sig_clause([Arg]) ->
+    [atom_to_binary(Arg, utf8), <<")">>];
+format_sig_clause([Arg | Args]) ->
+    [<<(atom_to_binary(Arg, utf8))/bytes, ", ">> | format_sig_clause(Args)].
 
 -spec entries(proplists:proplist()) -> [edoc:entry()].
 entries(Opts) ->
@@ -234,10 +262,8 @@ anno(Doc, Opts) ->
     Line = xpath_to_integer("./@line", Doc, Opts),
     erl_anno:set_file(File, erl_anno:new(Line)).
 
--spec docs_v1_entry(_, _, _, _, _, _) -> docs_v1_entry().
-docs_v1_entry(Kind, Name, Arity, Anno, EntryDoc, Metadata) ->
-    %% `Signature' is a pretty-printed label. The real signature (spec) is stored in `Metadata'.
-    Signature = [list_to_binary(atom_to_list(Name) ++ "/" ++ integer_to_list(Arity))],
+-spec docs_v1_entry(_, _, _, _, _, _, _) -> docs_v1_entry().
+docs_v1_entry(Kind, Name, Arity, Anno, Signature, EntryDoc, Metadata) ->
     {{Kind, Name, Arity}, Anno, Signature, EntryDoc, Metadata}.
 
 -spec xpath_to_text(_, _, _) -> binary().
