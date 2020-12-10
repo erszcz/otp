@@ -216,29 +216,28 @@ function_line_sig_spec(NA, Entries) ->
     end.
 
 format_signature(E = #entry{}) ->
-    %% Apparently, `#entry.args' is sometimes a list of args,
-    %% but sometimes a list of function clauses, each containing args.
-    %%
-    %% It seems that multiple clauses accepting a record, but matching on different fields,
-    %% are flattened to a single clause.
-    %% In such a case, the arg name is the uppercased record name.
+    %% `#entry.args' might be two things:
+    %% - a list of args if no `-spec' is present,
+    %% - a "double list" of args, i.e. a list with a single list of args within,
+    %%   if `-spec' is present.
+    %% See `test/eep48_SUITE.erl' for tests covering this.
     {Name, _} = E#entry.name,
     case E#entry.args of
-	[Clause | _] = Clauses when is_list(Clause) ->
-	    lists:flatmap(fun (Clause) -> format_sig_clause(Name, Clause) end, Clauses);
+	[Args] when is_list(Args) ->
+	    format_signature_(Name, Args);
 	Args when is_list(Args) ->
-	    format_sig_clause(Name, Args)
+	    format_signature_(Name, Args)
     end.
 
-format_sig_clause(Name, Args) ->
-    [list_to_binary(atom_to_list(Name)),  <<"(">> | format_sig_clause(Args)] ++ [<<"\n">>].
+format_signature_(Name, Args) ->
+    [list_to_binary(atom_to_list(Name)),  <<"(">> | format_signature_(Args)] ++ [<<"\n">>].
 
-format_sig_clause([]) ->
+format_signature_([]) ->
     [<<")">>];
-format_sig_clause([Arg]) ->
+format_signature_([Arg]) ->
     [atom_to_binary(Arg, utf8), <<")">>];
-format_sig_clause([Arg | Args]) ->
-    [<<(atom_to_binary(Arg, utf8))/bytes, ", ">> | format_sig_clause(Args)].
+format_signature_([Arg | Args]) ->
+    [<<(atom_to_binary(Arg, utf8))/bytes, ", ">> | format_signature_(Args)].
 
 -spec entries(proplists:proplist()) -> [edoc:entry()].
 entries(Opts) ->
