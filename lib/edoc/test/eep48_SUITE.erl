@@ -33,6 +33,8 @@
 	 f_sig_multiple_record_clauses/1,
 	 f_sig_multiple_record_clauses_with_spec/1]).
 
+-define(a2b(A), atom_to_binary(A, utf8)).
+
 %%
 %% CT preamble
 %%
@@ -190,8 +192,6 @@ equiv(Config) ->
 		 get_flat_doc({function, fun_with_equiv_tag, 0}, Docs)),
     ?assertMatch(<<"Equivalent to {<<\"arbitrary\">>, erlang, \"term\"}.">>,
 		 get_flat_doc({function, fun_with_non_call_equiv_tag, 0}, Docs)).
-
--define(a2b(A), atom_to_binary(A, utf8)).
 
 f_sig_single_simple_clause(Config) ->
     Docs = get_docs(Config, eep48_sigs),
