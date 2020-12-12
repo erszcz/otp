@@ -12,11 +12,10 @@ f_spec_type_with_name(Arg) -> ok.
 -spec f_spec_types_mixed(atom(), Arg2 :: tuple()) -> ok.
 f_spec_types_mixed(Arg1, Arg2) -> ok.
 
-%% Crashes chunk layout
-%-spec f_spec_with_multiple_clauses(atom(), atom()) -> atoms;
-%                                  (string(), integer()) -> not_atoms.
-%f_spec_with_multiple_clauses(A1, A2) -> atoms;
-%f_spec_with_multiple_clauses(S, I) -> not_atoms.
+-spec f_spec_with_multiple_clauses(atom(), atom()) -> atoms;
+                                  (string(), integer()) -> not_atoms.
+f_spec_with_multiple_clauses(A1, A2) -> atoms;
+f_spec_with_multiple_clauses(S, I) -> not_atoms.
 
 %% Crashes chunk layout
 %-spec f_spec_with_multiple_clauses_one_fun_clause(atom(), atom()) -> atoms;

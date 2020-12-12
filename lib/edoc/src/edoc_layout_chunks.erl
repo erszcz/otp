@@ -58,6 +58,9 @@
 
 -type xpath() :: string().
 
+-define(caught(Reason, M, F),
+	{_, {Reason, [{M, F, _, _} | _]}}).
+
 %%
 %%' EDoc layout callbacks
 %%
@@ -207,24 +210,28 @@ function(Doc, Opts) ->
       R :: {non_neg_integer(), signature(), [{signature, erl_parse:abstract_form()}]}.
 function_line_sig_spec(NA, Entries) ->
     #entry{name = NA, line = Line} = E = lists:keyfind(NA, #entry.name, Entries),
-    {Args, Sig} = args_and_signature(E),
+    {ArgNames, Sig} = args_and_signature(E),
     case lists:keyfind(spec, #tag.name, E#entry.data) of
 	false ->
 	    {Line, Sig, []};
 	#tag{name = spec} = T ->
-	    {Line, Sig, [{signature, [annotate_spec(Args, erl_syntax:revert(T#tag.form))]}]}
+	    F = erl_syntax:revert(T#tag.form),
+	    {Line, Sig, [{signature, [annotate_spec(ArgNames, F)]}]}
     end.
 
 args_and_signature(E = #entry{}) ->
-    %% `#entry.args' might be two things:
-    %% - a list of args if no `-spec' is present,
-    %% - a "double list" of args, i.e. a list with a single list of args within,
-    %%   if `-spec' is present.
-    %% See `test/eep48_SUITE.erl' for tests covering this.
+    %% At this point `#entry.args' might be two things:
+    %% - a list of arg names if no `-spec' is present,
+    %% - if `-spec' is present, it's a list of clauses;
+    %%   the number of clauses is the same as the number of specs clauses;
+    %%   all clauses have the first functions' clause arg names.
+    %%
+    %% See `test/eep48_SUITE_data/eep48_sigs.erl'
+    %% and `test/eep48_SUITE_data/eep48_specs.erl' for examples.
     {Name, _} = E#entry.name,
     case E#entry.args of
-	[Args] when is_list(Args) ->
-	    {Args, format_signature(Name, Args)};
+	[Args | _] = Clauses when is_list(Args) ->
+	    {Clauses, format_signature(Name, Args)};
 	Args when is_list(Args) ->
 	    {Args, format_signature(Name, Args)}
     end.
@@ -239,10 +246,17 @@ format_signature([Arg]) ->
 format_signature([Arg | Args]) ->
     [<<(atom_to_binary(Arg, utf8))/bytes, ", ">> | format_signature(Args)].
 
-annotate_spec(ArgNames, {attribute, Pos, spec, Data}) ->
-    {NA, [FunDef]} = Data,
-    NewData = {NA, [annotate_spec(ArgNames, FunDef)]},
-    {attribute, Pos, spec, NewData};
+annotate_spec(ArgClauses, {attribute, Pos, spec, Data} = Spec) ->
+    {NA, SpecClauses} = Data,
+    case catch lists:zip(ArgClauses, SpecClauses) of
+	?caught(function_clause, lists, zip) ->
+	    edoc_report:warning("cannot annotate spec: "
+				"function and spec clause numbers do not match\n", []),
+	    Spec;
+	ArgSpecClauses ->
+	    NewData = {NA, [ annotate_spec(AC, SC) || {AC, SC} <- ArgSpecClauses ]},
+	    {attribute, Pos, spec, NewData}
+    end;
 annotate_spec(ArgNames, {type, Pos, 'fun', Data}) ->
     [{type, _, product, ArgTypes}, RetType] = Data,
     AnnArgTypes = [ ann_type(Name, Pos, Type) || {Name, Type} <- lists:zip(ArgNames, ArgTypes) ],

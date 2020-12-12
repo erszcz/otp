@@ -272,7 +272,9 @@ f_spec_types_mixed(Config) ->
 f_spec_with_multiple_clauses(Config) ->
     Docs = get_docs(Config, eep48_specs),
     %?debugVal(Docs, 1000),
-    ?assertEqual( <<"">>,
+    ?assertEqual( <<"-spec f_spec_with_multiple_clauses(A1 :: atom(), A2 :: atom()) -> atoms;\n"
+		    "                                  (S :: string(), I :: integer()) ->\n"
+		    "                                      not_atoms.\n">>,
 		  get_pp_spec({function, ?FUNCTION_NAME, 2}, Docs) ).
 
 f_spec_with_multiple_clauses_one_fun_clause(Config) ->
