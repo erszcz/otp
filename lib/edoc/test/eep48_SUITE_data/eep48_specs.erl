@@ -17,14 +17,13 @@ f_spec_types_mixed(Arg1, Arg2) -> ok.
 f_spec_with_multiple_clauses(A1, A2) -> atoms;
 f_spec_with_multiple_clauses(S, I) -> not_atoms.
 
-%% Crashes chunk layout
-%-spec f_spec_with_multiple_clauses_one_fun_clause(atom(), atom()) -> atoms;
-%                                                 (string(), integer()) -> not_atoms.
-%f_spec_with_multiple_clauses_one_fun_clause(A1, A2) ->
-%    if
-%        is_atom(A1), is_atom(A2) -> atoms;
-%        true -> not_atoms
-%    end.
+-spec f_spec_with_multiple_clauses_one_fun_clause(atom(), atom()) -> atoms;
+                                                 (string(), integer()) -> not_atoms.
+f_spec_with_multiple_clauses_one_fun_clause(A1, A2) ->
+    if
+        is_atom(A1), is_atom(A2) -> atoms;
+        true -> not_atoms
+    end.
 
 -spec f_spec_lhs_match_expr(any()) -> ok.
 f_spec_lhs_match_expr(Pattern = {A, B}) -> ok.

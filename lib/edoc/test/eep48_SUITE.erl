@@ -280,7 +280,12 @@ f_spec_with_multiple_clauses(Config) ->
 f_spec_with_multiple_clauses_one_fun_clause(Config) ->
     Docs = get_docs(Config, eep48_specs),
     %?debugVal(Docs, 1000),
-    ?assertEqual( <<"">>,
+    ?assertEqual( <<"-spec f_spec_with_multiple_clauses_one_fun_clause(A1 :: atom(),\n"
+		    "                                                  A2 :: atom()) ->\n"
+		    "                                                     atoms;\n"
+		    "                                                 (A1 :: string(),\n"
+		    "                                                  A2 :: integer()) ->\n"
+		    "                                                     not_atoms.\n">>,
 		  get_pp_spec({function, ?FUNCTION_NAME, 2}, Docs) ).
 
 f_spec_lhs_match_expr(Config) ->
