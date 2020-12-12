@@ -34,6 +34,11 @@
 	 f_sig_multiple_record_clauses_with_spec/1,
 	 f_spec_type_without_name/1,
 	 f_spec_types_mixed/1,
+	 f_spec_with_multiple_clauses/1,
+	 f_spec_with_multiple_clauses_one_fun_clause/1,
+	 f_spec_lhs_match_expr/1,
+	 f_spec_rhs_match_expr/1,
+	 f_spec_unnamed_pattern/1,
 	 f_spec_bounded_fun/1]).
 
 -define(a2b(A), atom_to_binary(A, utf8)).
@@ -67,6 +72,11 @@ all() -> [edoc_app_should_pass_shell_docs_validation,
 	  f_sig_multiple_record_clauses_with_spec,
 	  f_spec_type_without_name,
 	  f_spec_types_mixed,
+	  f_spec_with_multiple_clauses,
+	  f_spec_with_multiple_clauses_one_fun_clause,
+	  f_spec_lhs_match_expr,
+	  f_spec_rhs_match_expr,
+	  f_spec_unnamed_pattern,
 	  f_spec_bounded_fun].
 
 %% TODO: remove these cases once EDoc supports extracting the relevant tags
@@ -258,6 +268,36 @@ f_spec_types_mixed(Config) ->
     %?debugVal(Docs, 1000),
     ?assertEqual( <<"-spec f_spec_types_mixed(Arg1 :: atom(), Arg2 :: tuple()) -> ok.\n">>,
 		  get_pp_spec({function, ?FUNCTION_NAME, 2}, Docs) ).
+
+f_spec_with_multiple_clauses(Config) ->
+    Docs = get_docs(Config, eep48_specs),
+    %?debugVal(Docs, 1000),
+    ?assertEqual( <<"">>,
+		  get_pp_spec({function, ?FUNCTION_NAME, 2}, Docs) ).
+
+f_spec_with_multiple_clauses_one_fun_clause(Config) ->
+    Docs = get_docs(Config, eep48_specs),
+    %?debugVal(Docs, 1000),
+    ?assertEqual( <<"">>,
+		  get_pp_spec({function, ?FUNCTION_NAME, 2}, Docs) ).
+
+f_spec_lhs_match_expr(Config) ->
+    Docs = get_docs(Config, eep48_specs),
+    %?debugVal(Docs, 1000),
+    ?assertEqual( <<"-spec f_spec_lhs_match_expr(Pattern :: any()) -> ok.\n">>,
+		  get_pp_spec({function, ?FUNCTION_NAME, 1}, Docs) ).
+
+f_spec_rhs_match_expr(Config) ->
+    Docs = get_docs(Config, eep48_specs),
+    %?debugVal(Docs, 1000),
+    ?assertEqual( <<"-spec f_spec_rhs_match_expr(Pattern :: any()) -> ok.\n">>,
+		  get_pp_spec({function, ?FUNCTION_NAME, 1}, Docs) ).
+
+f_spec_unnamed_pattern(Config) ->
+    Docs = get_docs(Config, eep48_specs),
+    %?debugVal(Docs, 1000),
+    ?assertEqual( <<"-spec f_spec_unnamed_pattern(_ :: any()) -> ok.\n">>,
+		  get_pp_spec({function, ?FUNCTION_NAME, 1}, Docs) ).
 
 f_spec_bounded_fun(Config) ->
     Docs = get_docs(Config, eep48_specs),
