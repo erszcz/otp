@@ -82,8 +82,8 @@
 -type env() :: #env{}.
 %% Environment information needed by EDoc for generating references.
 
--type comment() :: #comment{line :: integer(),
-			    text :: string()}.
+%-type comment_r() :: #comment{line :: integer(),
+%                              text :: string()}.
 %% Simplified comment data.
 
 
@@ -111,10 +111,10 @@
 -type function_name() :: {atom(), integer()}.
 -type filename() :: file:filename().
 -type proplist() :: proplists:proplist().
--type comment2() :: { Line :: integer(),
-		      Column :: integer(),
-		      Indentation :: integer(),
-		      Text :: [string()] }.
+-type comment() :: { Line :: integer(),
+		     Column :: integer(),
+		     Indentation :: integer(),
+		     Text :: [string()] }.
 -type syntaxTree() :: erl_syntax:syntaxTree().
 
 -compile({no_auto_import, [error/1]}).
@@ -553,7 +553,7 @@ layout(Doc, Opts) ->
 
 %% @equiv read_comments(File, [])
 
--spec read_comments(filename()) ->  [comment2()].
+-spec read_comments(filename()) ->  [comment()].
 read_comments(File) ->
     read_comments(File, []).
 
@@ -561,7 +561,7 @@ read_comments(File) ->
 %% module {@link //syntax_tools/erl_comment_scan} for details on the
 %% representation of comments. Currently, no options are avaliable.
 
--spec read_comments(File, Opts) -> [comment2()] when
+-spec read_comments(File, Opts) -> [comment()] when
       File :: filename(),
       Opts :: proplist().
 read_comments(File, _Opts) ->
