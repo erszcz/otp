@@ -839,7 +839,6 @@ get_doc(File, Opts) ->
       File :: filename(),
       Env :: env(),
       Options :: proplist(),
-      R :: {module(), edoc_module()}
-         | {module(), edoc_module(), [entry()]}.
+      R :: {module(), edoc_module()}.
 get_doc(File, Env, Opts) ->
     edoc_extract:source(File, Env, Opts).
