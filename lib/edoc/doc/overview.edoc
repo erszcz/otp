@@ -1121,7 +1121,8 @@ Erlang app can be found in the Erlang code path:
 $ pwd
 /tmp/recon
 $ rebar3 compile
-$ ~/work/erszcz/otp/lib/edoc/bin/edoc.escript -app recon -chunks -pa _build/default/lib/recon/ebin
+$ export PATH="$(dirname `which erl`)/../lib/erlang/lib/edoc-0.12/bin:$PATH"
+$ edoc.escript -app recon -chunks -pa _build/default/lib/recon/ebin
 Running with opts:
 #{app => recon,
   code_paths => ["_build/default/lib/recon/ebin"],
