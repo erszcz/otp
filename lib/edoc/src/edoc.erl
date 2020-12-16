@@ -111,10 +111,7 @@
 -type function_name() :: {atom(), integer()}.
 -type filename() :: file:filename().
 -type proplist() :: proplists:proplist().
--type comment() :: { Line :: integer(),
-		     Column :: integer(),
-		     Indentation :: integer(),
-		     Text :: [string()] }.
+-type comment() :: erl_comment_scan:comment().
 -type syntaxTree() :: erl_syntax:syntaxTree().
 
 -compile({no_auto_import, [error/1]}).
