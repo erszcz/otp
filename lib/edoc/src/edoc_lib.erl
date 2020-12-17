@@ -38,7 +38,8 @@
 	 write_file/3, write_file/4, write_info_file/3,
 	 read_info_file/1, get_doc_env/1, get_doc_env/3, copy_file/2,
 	 run_doclet/2, run_layout/2,
-	 simplify_path/1, timestr/1, datestr/1, read_encoding/2]).
+	 simplify_path/1, timestr/1, datestr/1, read_encoding/2,
+	 infer_module_app/1]).
 
 -import(edoc_report, [report/2, warning/2]).
 
@@ -69,6 +70,29 @@ read_encoding(File, Options) ->
     case epp:read_encoding(File, Options) of
         none -> epp:default_encoding();
         Encoding -> Encoding
+    end.
+
+%% @doc Infer application containing the given module.
+%%
+%% It's expected that modules which are not preloaded
+%% and don't match the  `<app>/ebin/<mod>.beam' path pattern
+%% will NOT have an app name inferred properly.
+%% `no_app' is returned in such cases.
+-spec infer_module_app(module()) -> no_app | {app, atom()}.
+infer_module_app(Mod) ->
+    case code:which(Mod) of
+	ModPath when is_list(ModPath) ->
+	    case lists:reverse(string:tokens(ModPath, "/")) of
+		[_BeamFile, "ebin", AppVer | _] ->
+		    [App | _] = string:tokens(AppVer, "-"),
+		    {app, list_to_atom(App)};
+		_ ->
+		    no_app
+	    end;
+	preloaded ->
+	    {app, erts};
+	_ ->
+	    no_app
     end.
 
 %% @private

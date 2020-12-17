@@ -160,30 +160,15 @@ get_uri(Name, Env) ->
     NewName = infer_module_app(Name),
     edoc_refs:get_uri(to_ref(NewName), Env).
 
-%% @doc Infer application containing the given module.
 infer_module_app(#t_name{app = [], module = M} = TName) when is_atom(M) ->
-    case infer_module_app_(M) of
+    case edoc_lib:infer_module_app(M) of
 	no_app ->
 	    TName;
-	App when is_atom(App) ->
+	{app, App} when is_atom(App) ->
 	    TName#t_name{app = App}
     end;
 infer_module_app(Other) ->
     Other.
-
-infer_module_app_(Mod) ->
-    case code:which(Mod) of
-	ModPath when is_list(ModPath) ->
-	    case lists:reverse(string:tokens(ModPath, "/")) of
-		[_BeamFile, "ebin", AppVer | _] ->
-		    [App | _] = string:tokens(AppVer, "-"),
-		    list_to_atom(App);
-		_ ->
-		    no_app
-	    end;
-	_ ->
-	    no_app
-    end.
 
 to_xml(#t_var{name = N}, _Env) ->
     {typevar, [{name, atom_to_list(N)}], []};
