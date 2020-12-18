@@ -279,8 +279,8 @@ f_spec_types_mixed(Config) ->
     ?assertEqual( <<"-spec f_spec_types_mixed(Arg1 :: atom(), Arg2 :: tuple()) -> ok.\n">>,
 		  get_pp_spec({function, ?FUNCTION_NAME, 2}, Docs) ).
 
-f_spec_with_multiple_clauses(Config) ->
-    Docs = get_docs(Config, eep48_specs),
+f_spec_with_multiple_clauses(_Config) ->
+    %Docs = get_docs(Config, eep48_specs),
     %?debugVal(Docs, 1000),
     %?assertEqual( <<"-spec f_spec_with_multiple_clauses(A1 :: atom(), A2 :: atom()) -> atoms;\n"
     %                "                                  (S :: string(), I :: integer()) ->\n"
