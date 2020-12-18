@@ -40,7 +40,7 @@
 	 f_spec_lhs_match_expr/1,
 	 f_spec_rhs_match_expr/1,
 	 f_spec_unnamed_pattern/1,
-	 f_spec_bounded_fun/1]).
+	 f_spec_bounded_single_clause_fun/1]).
 
 -define(a2b(A), atom_to_binary(A, utf8)).
 -define(io2b(IO), iolist_to_binary(IO)).
@@ -80,7 +80,7 @@ all() -> [edoc_app_should_pass_shell_docs_validation,
 	  f_spec_lhs_match_expr,
 	  f_spec_rhs_match_expr,
 	  f_spec_unnamed_pattern,
-	  f_spec_bounded_fun].
+	  f_spec_bounded_single_clause_fun].
 
 %% TODO: remove these cases once EDoc supports extracting the relevant tags
 not_supported() -> [type_since_tag,
@@ -317,10 +317,16 @@ f_spec_unnamed_pattern(Config) ->
     ?assertEqual( <<"-spec f_spec_unnamed_pattern(_ :: any()) -> ok.\n">>,
 		  get_pp_spec({function, ?FUNCTION_NAME, 1}, Docs) ).
 
-f_spec_bounded_fun(Config) ->
+f_spec_bounded_single_clause_fun(Config) ->
     Docs = get_docs(Config, eep48_specs),
     %?debugVal(Docs, 1000),
-    {skip, not_done_yet}.
+    ?assertEqual( <<"-spec f_spec_bounded_single_clause_fun(A, T, S, I) -> ok\n"
+		    "                                          when\n"
+		    "                                              A :: atom(),\n"
+		    "                                              T :: tuple(),\n"
+		    "                                              S :: string(),\n"
+		    "                                              I :: integer().\n">>,
+		  get_pp_spec({function, ?FUNCTION_NAME, 4}, Docs) ).
 
 %%
 %% Helpers
