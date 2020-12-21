@@ -9,7 +9,6 @@
 	     edoc_data,
 	     edoc_doclet,
 	     edoc_doclet_chunks,
-	     edoc_doclet_default,
 	     edoc_extract,
 	     edoc_layout,
 	     edoc_layout_chunks,
