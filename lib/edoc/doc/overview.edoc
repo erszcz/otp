@@ -87,7 +87,7 @@ Note that the function {@link edoc:file/2} belongs to the old, deprecated
 interface (from EDoc version 0.1), and should not be used.
 
 It's also possible to run EDoc directly from the command line,
-using the `bin/edoc.escript' helper script.
+using the {@link edoc_cmd. `edoc' EScript}.
 The script acts as a command line entry point to both {@link edoc:application/2}
 and {@link edoc:files/2} functions.
 It also allows to generate just the EEP-48 doc chunks (using the `-chunks' flag)
@@ -1107,14 +1107,14 @@ EDoc implements EEP-48 ([http://erlang.org/eeps/eep-0048.html]) and allows
 to output doc chunks for Erlang projects which use the EDoc language for source
 code documentation.
 
-There are two ways to generate the doc chunks: either by using `bin/edoc.escript'
+There are two ways to generate the doc chunks: either by using `bin/edoc'
 or by using the <a href="http://rebar3.org/docs/commands/#edoc">Rebar3 `edoc' command</a>.
 Ultimately, they're both just entry points to EDoc, the application,
 so deciding which to use is just a matter of preference.
 
-=== Using edoc.escript ===
+=== Using edoc EScript ===
 
-In order to generate doc chunks using `bin/edoc.escript', make sure the compiled
+In order to generate doc chunks using `bin/edoc', make sure the compiled
 Erlang app can be found in the Erlang code path:
 
 ```
@@ -1122,7 +1122,7 @@ $ pwd
 /tmp/recon
 $ rebar3 compile
 $ export PATH="$(dirname `which erl`)/../lib/erlang/lib/edoc-0.12/bin:$PATH"
-$ edoc.escript -app recon -chunks -pa _build/default/lib/recon/ebin
+$ edoc -app recon -chunks -pa _build/default/lib/recon/ebin
 Running with opts:
 #{app => recon,
   code_paths => ["_build/default/lib/recon/ebin"],

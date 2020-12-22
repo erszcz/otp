@@ -29,6 +29,7 @@ APPLICATION=edoc
 # ----------------------------------------------------
 XML_APPLICATION_FILES = ref_man.xml
 EDOC_REF3_FILES = edoc.xml \
+	edoc_cmd.xml \
 	edoc_doclet.xml \
 	edoc_extract.xml \
 	edoc_layout.xml \
