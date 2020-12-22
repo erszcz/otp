@@ -28,8 +28,10 @@ APPLICATION=edoc
 # Target Specs
 # ----------------------------------------------------
 XML_APPLICATION_FILES = ref_man.xml
-EDOC_REF3_FILES = edoc.xml \
-	edoc_cmd.xml \
+XML_REF1_FILES = \
+	edoc_cmd.xml
+EDOC_REF3_FILES = \
+	edoc.xml \
 	edoc_doclet.xml \
 	edoc_extract.xml \
 	edoc_layout.xml \

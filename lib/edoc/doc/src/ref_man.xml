@@ -40,5 +40,6 @@
   <xi:include href="edoc_layout.xml"/>
   <xi:include href="edoc_lib.xml"/>
   <xi:include href="edoc_run.xml"/>
+  <xi:include href="edoc_cmd.xml"/>
 </application>
 
