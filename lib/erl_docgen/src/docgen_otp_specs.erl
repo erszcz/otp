@@ -80,11 +80,15 @@ functions(Fs, Opts) ->
 		  end, Fs).
 
 function(Name, #xmlElement{content = Es}, Opts) ->
-    TS = get_content(typespec, Es),
+    TSs = get_elem(typespec, Es),
+    lists:concat([ spec_clause(Name, TS, Opts)
+		   || #xmlElement{content = TS} <- TSs ]).
+
+spec_clause(Name, TS, Opts) ->
     Spec = typespec(TS, Opts),
     [{spec,(Name
-            ++ [?IND(2),{contract,Spec}]
-            ++ typespec_annos(TS))},
+	    ++ [?IND(2),{contract,Spec}]
+	    ++ typespec_annos(TS))},
      ?NL].
 
 function_name(E) ->
