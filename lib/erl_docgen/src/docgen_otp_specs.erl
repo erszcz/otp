@@ -24,6 +24,8 @@
 
 -include("xmerl.hrl").
 
+-include_lib("eunit/include/eunit.hrl").
+
 -define(XML_EXPORT, xmerl_xml).
 -define(DEFAULT_XML_EXPORT, ?XML_EXPORT).
 -define(DEFAULT_PP, erl_pp).
@@ -63,7 +65,19 @@ timestamp() ->
                                  edoc_lib:timestr(time())])]},?NL].
 
 functions(Fs, Opts) ->
-    lists:flatmap(fun ({Name, E}) -> function(Name, E, Opts) end, Fs).
+    lists:flatmap(fun ({Name, E}) ->
+			  F = function(Name, E, Opts),
+			  case F of
+			      [{spec, Spec} | _] ->
+				  case lists:keyfind(name, 1, Spec) of
+				      {_, [N]} when N == "appcall"; N == "memory" ->
+					  ?debugVal(F, 1000);
+				      _ -> ok
+				  end;
+			      _ -> ok
+			  end,
+			  F
+		  end, Fs).
 
 function(Name, #xmlElement{content = Es}, Opts) ->
     TS = get_content(typespec, Es),
