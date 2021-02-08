@@ -83,6 +83,7 @@
 -export_type([max_heap_size/0]).
 -export_type([message_queue_data/0]).
 -export_type([monitor_option/0]).
+-export_type([cpu_topology/0]).
 
 -type ext_binary() :: binary().
 -type ext_iovec() :: iovec().
