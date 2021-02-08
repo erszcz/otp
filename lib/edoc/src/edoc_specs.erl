@@ -28,6 +28,8 @@
 -include("edoc.hrl").
 -include("edoc_types.hrl").
 
+-include_lib("eunit/include/eunit.hrl").
+
 -type syntaxTree() :: erl_syntax:syntaxTree().
 
 -define(TOP_TYPE, term).
@@ -109,10 +111,14 @@ docs(Forms, CommentFun) ->
       File :: file:filename(),
       Module :: edoc:module_meta().
 add_type_data(Entries, Opts, File, Module) ->
+    %?debugVal(Entries, 1000),
     TypeDefs0 = espec_types(Entries),
+    %?debugVal(TypeDefs0, 1000),
     TypeTable = ets:new(etypes, [ordered_set]),
     Es1 = expand_records(Entries, TypeDefs0, TypeTable, Opts, File, Module),
+    %?debugVal(Es1, 1000),
     Es = [use_tags(E, TypeTable) || E <- Es1],
+    %?debugVal(Es, 1000),
     true = ets:delete(TypeTable),
     Es.
 
@@ -252,7 +258,18 @@ opaque2abstr(type, T) -> T.
 %% Selects seen types (exported types, types used by specs),
 %% skips records and unused types.
 use_tags(#entry{data = Ts} = E, TypeTable) ->
-    use_tags(Ts, E, TypeTable, []).
+    erlang:put(dbg, false),
+    E#entry.name == {system_info, 1} andalso
+    begin
+	erlang:put(dbg, true),
+	TypeTableL = ets:tab2list(TypeTable),
+	?debugVal(TypeTableL, 1000)
+    end,
+    erlang:get(dbg) andalso ?debugVal(E, 1000),
+    R = use_tags(Ts, E, TypeTable, []),
+    erlang:get(dbg) andalso ?debugVal(R, 1000),
+    erlang:put(dbg, false),
+    R.
 
 use_tags([], E, _TypeTable, NTs) ->
     E#entry{data = lists:reverse(NTs)};
@@ -265,14 +282,19 @@ use_tags([#tag{origin = code} = T | Ts], E, TypeTable, NTs) ->
 	    use_tags(Ts, E#entry{args = Args}, TypeTable, [T | NTs]);
 	type ->
 	    TypeName = type_name(T),
+	    erlang:get(dbg) andalso ?debugVal(TypeName, 1000),
 	    case ets:lookup(TypeTable, TypeName) of
 		[{{{record,_},_},_,_}] ->
+		    erlang:get(dbg) andalso ?debugMsg("record"),
 		    use_tags(Ts, E, TypeTable, NTs);
 		[{_,_,not_seen}] ->
+		    erlang:get(dbg) andalso ?debugMsg("not_seen"),
 		    use_tags(Ts, E, TypeTable, NTs);
 		[] ->
+		    erlang:get(dbg) andalso ?debugMsg("empty"),
 		    use_tags(Ts, E, TypeTable, NTs);
 		[{TypeName, Tag, seen}] ->
+		    erlang:get(dbg) andalso ?debugMsg("seen"),
 		    use_tags(Ts, E, TypeTable, [Tag | NTs])
 	    end
     end;

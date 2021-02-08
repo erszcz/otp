@@ -37,6 +37,8 @@
 
 -include("edoc.hrl").
 
+-include_lib("eunit/include/eunit.hrl").
+
 %% TODO: check that variables in @equiv are found in the signature
 %% TODO: copy types from target (if missing) when using @equiv
 
@@ -95,6 +97,8 @@ module(Module, Entries, Env, Opts) ->
     HeaderTags = HeaderEntry#entry.data,
     AllTags = get_all_tags(Entries),
     Functions = function_filter(Entries, Opts),
+    Types = types(AllTags, Env),
+    %?debugVal(Types, 1000),
     Out = {module, ([{name, Name},
 		     {root, Env#env.root},
                      {encoding, Module#module.encoding}]
@@ -117,7 +121,7 @@ module(Module, Entries, Env, Opts) ->
 	    ++ sees(HeaderTags, Env)
 	    ++ references(HeaderTags)
 	    ++ todos(HeaderTags, Opts)
-	    ++ [{typedecls, types(AllTags, Env)},
+	    ++ [{typedecls, Types},
 		{functions, functions(Functions, Env, Opts)}
 		| callbacks(Functions, Module, Env, Opts)])
 	  },

@@ -24,6 +24,8 @@
 
 -include("xmerl.hrl").
 
+-include_lib("eunit/include/eunit.hrl").
+
 -define(XML_EXPORT, xmerl_xml).
 -define(DEFAULT_XML_EXPORT, ?XML_EXPORT).
 -define(DEFAULT_PP, erl_pp).
@@ -50,6 +52,7 @@ layout_module(#xmlElement{name = module, content = Es}=E, Opts) ->
     Functions = [{function_name(Elem), Elem} ||
                     Elem <- get_content(functions, Es)],
     Types = [{type_name(Elem), Elem} || Elem <- get_content(typedecls, Es)],
+    %?debugVal(Types, 1000),
     Body = [{module,
              [{name,[Name]}],
              ([?NL] ++ types(lists:sort(Types), Opts)
