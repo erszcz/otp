@@ -259,12 +259,12 @@ opaque2abstr(type, T) -> T.
 %% skips records and unused types.
 use_tags(#entry{data = Ts} = E, TypeTable) ->
     erlang:put(dbg, false),
-    E#entry.name == {system_info, 1} andalso
-    begin
-	erlang:put(dbg, true),
-	TypeTableL = ets:tab2list(TypeTable),
-	?debugVal(TypeTableL, 1000)
-    end,
+    %E#entry.name == {system_info, 1} andalso
+    %begin
+    %    erlang:put(dbg, true),
+    %    TypeTableL = ets:tab2list(TypeTable),
+    %    ?debugVal(TypeTableL, 1000)
+    %end,
     erlang:get(dbg) andalso ?debugVal(E, 1000),
     R = use_tags(Ts, E, TypeTable, []),
     erlang:get(dbg) andalso ?debugVal(R, 1000),
@@ -617,6 +617,7 @@ xrecs([E0 | Es0], P) ->
 
 seen_type(N, NArgs, P) ->
     TypeName = {N, NArgs},
+    ?debugFmt("seen_type: ~p\n", [TypeName]),
     #parms{tab = DT} = P,
     case {ets:lookup(DT, TypeName), N} of
         {[{TypeName, _, seen}], _} ->

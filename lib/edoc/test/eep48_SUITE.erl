@@ -445,7 +445,7 @@ t_only_tag(Config) ->
 
 t_redundant(Config) ->
     Docs = get_docs(Config, eep48_redundant),
-    %?debugVal(Docs, 1000),
+    ?debugVal(Docs, 1000),
     ?assertEqual( <<"-type t_redundant() :: any().\n">>,
 		  get_pp_spec({type, ?FUNCTION_NAME, 0}, Docs) ),
     ?assertEqual( <<"Type t_redundant defined with an attribute, redundant with a tag.">>,
