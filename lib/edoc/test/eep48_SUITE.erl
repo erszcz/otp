@@ -248,7 +248,7 @@ see_tags_grouped_together(Config) ->
 
 equiv(Config) ->
     Docs = get_docs(Config, eep48_links),
-    %?debugVal(Docs, 1000),
+    ?debugVal(Docs, 1000),
     ?assertMatch(<<"Equivalent to equiv_target(ok).">>,
 		 get_flat_doc({function, fun_with_equiv_tag, 0}, Docs)),
     ?assertMatch(<<"Equivalent to {<<\"arbitrary\">>, erlang, \"term\"}.">>,

@@ -91,6 +91,11 @@ see_local_type() -> ok.
 see_external_type() -> ok.
 
 %% @doc This is referenced from another function with the `equiv' tag.
+%%
+%% @param Arg This is a parameter named `Arg'.
+%% @returns Return `Arg'.
+%% %% @throws integer().
+%% @end
 equiv_target(Arg) -> Arg.
 
 %% @equiv equiv_target(ok)

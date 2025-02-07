@@ -45,6 +45,8 @@
 
 -include("edoc.hrl").
 
+-include_lib("eunit/include/eunit.hrl").
+
 -export_type([docs_v1/0,
               docs_v1_entry/0,
               beam_language/0,
@@ -130,8 +132,10 @@ overview(E=#xmlElement{name = overview, content = Es}, Options) ->
 -spec edoc_to_chunk(edoc:edoc_module(), proplists:proplist()) -> docs_v1().
 edoc_to_chunk(Doc, Opts) ->
     [Doc] = xmerl_xpath:string("//module", Doc),
+    ?debugVal(xmerl_lib:simplify_element(Doc), 1000),
     {source, File} = lists:keyfind(source, 1, Opts),
     Entries = entries(Opts),
+    ?debugVal(Entries, 1000),
     ModuleEntry = edoc_data:get_entry(module, Entries),
     Line = ModuleEntry#entry.line,
     Anno = erl_anno:set_file(File, erl_anno:new(Line)),
